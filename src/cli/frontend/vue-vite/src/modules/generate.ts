@@ -1,9 +1,9 @@
 import { isLocalEntity, isModule, LocalEntity, Model, Module } from "../../../../../language/generated/ast.js";
 import { createPath } from "../../../../util/generator-utils.js";
-import { generate as generateAPI} from "./api/generate.js"
-import { generate as generateControllers} from "./controllers/generate.js"
-import { generate as generateRoutes} from "./routes/generate.js"
-import { generate as generateTypes} from "./types/generate.js"
+// import { generate as generateAPI} from "./api/generate.js"
+// import { generate as generateControllers} from "./controllers/generate.js"
+// import { generate as generateRoutes} from "./routes/generate.js"
+// import { generate as generateTypes} from "./types/generate.js"
 import { generate as generateViews } from "./views/generate.js"
 
 import fs from "fs"
@@ -67,22 +67,22 @@ function generateExportClass(clsList: LocalEntity[]) : string {
 function generateModule(model: Model, cls: LocalEntity, target_folder: string) : void {
     fs.writeFileSync(path.join(target_folder, 'index.ts'), generateModIndex(cls))
 
-    const api_folder = createPath(target_folder, "api")
-    const controllers_folder = createPath(target_folder, "controllers")
-    const routes_folder = createPath(target_folder, "routes")
-    const types_folder = createPath(target_folder, "types")
+    // const api_folder = createPath(target_folder, "api")
+    // const controllers_folder = createPath(target_folder, "controllers")
+    // const routes_folder = createPath(target_folder, "routes")
+    // const types_folder = createPath(target_folder, "types")
     const views_folder = createPath(target_folder, "views")
 
-    fs.mkdirSync(api_folder, {recursive:true})
-    fs.mkdirSync(controllers_folder, {recursive:true})
-    fs.mkdirSync(routes_folder, {recursive:true})
-    fs.mkdirSync(types_folder, {recursive:true})
-    fs.mkdirSync(views_folder, {recursive:true})
+    // fs.mkdirSync(api_folder, {recursive:true})
+    // fs.mkdirSync(controllers_folder, {recursive:true})
+    // fs.mkdirSync(routes_folder, {recursive:true})
+    // fs.mkdirSync(types_folder, {recursive:true})
+    // fs.mkdirSync(views_folder, {recursive:true})
 
-    generateAPI(model, cls, api_folder)
-    generateControllers(model, cls, controllers_folder)
-    generateRoutes(model, cls, routes_folder)
-    generateTypes(model, cls, types_folder)
+    // generateAPI(model, cls, api_folder)
+    // generateControllers(model, cls, controllers_folder)
+    // generateRoutes(model, cls, routes_folder)
+    // generateTypes(model, cls, types_folder)
     generateViews(model, cls, views_folder)
 }
 

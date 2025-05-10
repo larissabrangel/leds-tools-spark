@@ -1,4 +1,4 @@
-import { /*EnumX, isAttribute, isEnumX, isLocalEntity, isModule, isRelation, LocalEntity,*/ type Model, /*type Module*/ } from '../language/generated/ast.js';
+import { Model } from '../language/generated/ast.js';
 import { GenerateOptions } from './main.js';
 import { generate as pythonGenerate } from './backend/python/generator.js';
 import { generate as javaGenerate } from './backend/java/generator.js';
@@ -51,74 +51,6 @@ export function generate(model: Model, filePath: string, destination: string | u
 
     return final_destination;
 }
-
-/*
-function fileToSparkProject(model: Model) : void {
-    // config
-    const softwarename: string = model.configuration?.name ?? ""
-    const about: string = model.configuration?.description ?? ""
-    var language: string = ""
-
-    switch(model.configuration?.language) {
-        case('python'): 
-            language = "python"
-
-        case('java'):
-            language = "java"
-
-        case('csharp-minimal-api'):
-            language = "csharp-minimal-api"
-
-        case('csharp-clean-architecture'):
-            language = "csharp-clean-architecture"
-    }
-
-    const artifacts: (LocalEntity | EnumX)[] = []
-    
-    for (const absElem of model.abstractElements) {
-        if (isModule(absElem)) {
-            // module
-            const modName: string = absElem.name
-
-            // artefacts
-            for (const elem of absElem.elements) {
-                // class
-                if (isLocalEntity(elem)) {
-                    const clsName = elem.name
-
-                    // attribute
-                    for (const attr of elem.attributes) {
-                        if (isAttribute(attr)) {
-                            const attrName: string = attr.name
-                            const attrType: string = attr.type.toString() 
-                        }
-                    }
-
-                    // relation
-                    for (const rel of elem.relations) {
-                        if (isRelation(rel)) {
-                            const owner: LocalEntity = elem
-                            const relType = rel.$type
-                            const target = rel.type.ref
-                        }
-                    }
-                }
-
-                // enum
-                if (isEnumX(elem)) {
-                    const enumName: string = elem.name
-                    const enumValues: string[] = []
-                    for (const value of elem.attributes) {
-                        enumValues.push(value.name)
-                    }
-                }
-
-                artifacts.push(elem as LocalEntity | EnumX)
-            }
-        }
-    }
-}
-*/
 
 function extractDestination(filePath: string, destination?: string) : string {
     const path_ext = new RegExp(path.extname(filePath)+'$', 'g')
