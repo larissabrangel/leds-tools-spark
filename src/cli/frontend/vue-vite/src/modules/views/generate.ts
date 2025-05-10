@@ -37,8 +37,7 @@ const modo = computed<'criar' | 'editar'>(() => {
 const ui = useUiStore()
 
 const id = ref('')
-
-const nome = ref('')
+${generateRefs(cls)}
 
 const primeiraMaiuscula: ValidationResultFunction = (novoNome: string) => {
   if (/^[A-Z].*$/.test(novoNome)) {
@@ -109,19 +108,7 @@ onBeforeMount(async () => {
 
 <template>
   <card class="w-md">
-    <text-input
-      class="w-full"
-      placeholder="Nome"
-      v-model="nome"
-      :rules="regrasNome"
-      @validationUpdate="updateNomeValido"
-    />
-
-    <text-input
-      class="w-full"
-      placeholder="Descrição"
-      v-model="descricao"
-    />
+    ${generateTextInputs(cls)}
 
     <div class="flex justify-end">
       <p-button
@@ -183,4 +170,45 @@ onBeforeMount(carregar${cls.name}s)
   />
 </template>
 `
+}
+
+
+// Gera as reactive variables para cada atributo da classe
+function generateRefs(cls: LocalEntity) : string {
+    var str = ""
+    for (const attr of cls.attributes) {
+        str = str.concat(`const ${attr.name} = ref('')\n`)
+    }
+    return str
+}
+
+// Gera text inputs para cada atributo da classe
+function generateTextInputs(cls: LocalEntity) : string {
+    var str = ""
+    for (const attr of cls.attributes) {
+      if (attr.name.toLowerCase() === "nome") {
+        str = str.concat(expandToString`
+          <text-input
+      class="w-full"
+      placeholder="Nome"
+      v-model="nome"
+      :rules="regrasNome"
+      @validationUpdate="updateNomeValido"
+      />\n`)
+      }
+      else{
+        str = str.concat(expandToString`
+          <text-input
+      class="w-full"
+      placeholder="${capitalizeFirstLetter(attr.name)}"
+      v-model="${attr.name}"
+      />\n`)
+      }
+    }
+    return str
+}
+
+function capitalizeFirstLetter(str: string): string {
+  if (!str) return str; // Retorna como está se a string for vazia
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

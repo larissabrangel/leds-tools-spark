@@ -1,4 +1,4 @@
-import { EnumX, isAttribute, isEnumX, isLocalEntity, isModule, isRelation, LocalEntity, type Model, type Module } from '../language/generated/ast.js';
+import { /*EnumX, isAttribute, isEnumX, isLocalEntity, isModule, isRelation, LocalEntity,*/ type Model, /*type Module*/ } from '../language/generated/ast.js';
 import { GenerateOptions } from './main.js';
 import { generate as pythonGenerate } from './backend/python/generator.js';
 import { generate as javaGenerate } from './backend/java/generator.js';
@@ -52,6 +52,7 @@ export function generate(model: Model, filePath: string, destination: string | u
     return final_destination;
 }
 
+/*
 function fileToSparkProject(model: Model) : void {
     // config
     const softwarename: string = model.configuration?.name ?? ""
@@ -117,6 +118,7 @@ function fileToSparkProject(model: Model) : void {
         }
     }
 }
+*/
 
 function extractDestination(filePath: string, destination?: string) : string {
     const path_ext = new RegExp(path.extname(filePath)+'$', 'g')
