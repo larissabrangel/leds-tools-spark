@@ -13,23 +13,10 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(target_folder_public, {recursive:true})
     fs.mkdirSync(assets, {recursive:true})
     fs.mkdirSync(images, {recursive:true})
-
-    fs.writeFileSync(path.join(target_folder_public, '.env'), generateEnv());
-    fs.writeFileSync(path.join(target_folder_public, '_redirects'), generateRedirects());
+    
     fs.writeFileSync(path.join(target_folder_public, 'favicon.png'), generateFavicon());
 
 }  
-
-function generateEnv(): string {
-    return expandToString`
-VITE_API_URL="/"`
-}
-
-function generateRedirects(): string {
-    return expandToString`
-/*    /index.html   200
-`
-}
 
 function generateFavicon(): string {
     return expandToString`
