@@ -12,7 +12,7 @@ export function generate(model: Model, target_folder: string) : void {
     // config
     const softwareName = model.configuration?.name ?? ""
     const softwareDescription = model.configuration?.description ?? ""
- 
+    
     // packages
     const listPkg = fileToPackages(model)
  
@@ -20,9 +20,6 @@ export function generate(model: Model, target_folder: string) : void {
     let project = new SEON.default.ProjectAbstraction(softwareName, softwareDescription, SEON.default.vueModularArchProjectSettings, listPkg);
     
     project.createProject();
-    project.createProject();
-    project.createProject();
-    
 
     const target_folder_front = createPath(target_folder, "frontend")
 
@@ -35,7 +32,7 @@ export function generate(model: Model, target_folder: string) : void {
     srcGenerator(model, target_folder_front)
 }
 
-function fileToPackages(model: Model) {
+export function fileToPackages(model: Model) {
 
     const listPackages = []
 
