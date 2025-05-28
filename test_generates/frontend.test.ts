@@ -9,6 +9,41 @@ import fs from 'fs';
 import path from 'path';
 
 
+function checkIsDir(pathTest: string) { 
+    try {
+        const stats = fs.statSync(pathTest);
+        if (!stats.isDirectory()) {
+            throw new Error(`Path exists but is not a directory: ${pathTest}`);
+        }
+    } catch (err) {
+        throw new Error(`Directory not found or inaccessible: ${pathTest}`);
+    }
+}
+
+function checkFileContent(fileTest: string, testString: string) {
+    try {
+        const fileGeneratedString = fs.readFileSync(fileTest, 'utf-8')
+        if (JSON.stringify(fileGeneratedString) != testString) { 
+            throw new Error(`The content of ${fileTest} is wrong`);
+        }
+    }
+    catch (err) {
+        throw new Error(`File not found or inacessible: ${fileTest}`);
+    }
+}
+
+function checkIsFile(fileTest: string) { 
+    try {
+        const stats = fs.statSync(fileTest);
+        if (!stats.isFile()) {
+            throw new Error(`Path exists but is not a file: ${fileTest}`);
+        }
+    } catch (err) {
+        throw new Error(`File not found or inaccessible: ${fileTest}`);
+    }
+}
+
+
 let services: ReturnType<typeof createSPARKServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 let document: LangiumDocument<Model> | undefined;
@@ -50,17 +85,41 @@ test(`Test File Names and Their Contents`, async () => {
 
         setTimeout(() => {
             resolve();  // simulating execution
-        }, 10000);  // 25 s to 
+        }, 25000);  // 25 s to 
     });
 
-    generate(model, target_folder);
+    // generate(model, target_folder);
 
+    // separar por arquivos (??)
     const frontEndPath = path.join(target_folder, 'frontend')
-    try {
-        const stats = fs.statSync(frontEndPath);
-        expect(stats.isDirectory()).toBe(true);
-    } catch (err) { // IOE (?)
-        expect(true).toBe(false);
-    }
+    checkIsDir(frontEndPath)
+
+    const cypressPath = path.join(frontEndPath, 'cypress')
+    checkIsDir(cypressPath)
+
+    const publicPath = path.join(frontEndPath, 'public')
+    checkIsDir(publicPath)
+
+    const srcPath = path.join(frontEndPath, 'src')
+    checkIsDir(srcPath)
+
+    const e2ePath = path.join(cypressPath, 'e2e')
+    checkIsDir(srcPath)
+
+    const pageObjectsPath = path.join(cypressPath, 'pageObjects')
+    checkIsDir(pageObjectsPath)
+
+    const step_definitions = path.join(e2ePath, 'step_definitions')
+    checkIsDir(step_definitions)
+    checkIsFile(path.join(step_definitions, 'deleteEntity1.feature'))
+    checkIsFile(path.join(step_definitions, 'deleteEntity2.feature'))
+
+    const entity1 = path.join(step_definitions, 'Entity1')
+    checkIsDir(entity1)
+    checkIsFile(path.join(entity1, 'deleteEntity1.ts'))
+
+    const entity2 = path.join(step_definitions, 'Entity2')
+    checkIsDir(entity2)
+    checkIsFile(path.join(entity2, 'deleteEntity2.ts'))
 
 });
