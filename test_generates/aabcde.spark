@@ -1,0 +1,20 @@
+        Configuration {
+            software_name: "Test"
+            about: "Testes dos geradores do frontend"
+            language: python
+        }
+                
+        module Test {
+                    
+            entity Entidade1{
+                nome: string
+                numero: integer
+                Entidade1 OneToOne Test.Entidade2
+            }
+                
+            entity Entidade2 {
+                nome: string
+                verificacao: boolean
+            } 
+                    
+        }
