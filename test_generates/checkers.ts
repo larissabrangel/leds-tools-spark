@@ -16,12 +16,12 @@ export function checkFileContent(fileTest: string, testString: string, isJson: b
         const fileGeneratedString = fs.readFileSync(fileTest, 'utf-8');
         if (isJson) {
             const normalizedReferenceJsonString = JSON.stringify(JSON.parse(testString));
-            if (JSON.stringify(JSON.parse(fileGeneratedString)) != normalizedReferenceJsonString) { 
+            if (JSON.stringify(JSON.parse(fileGeneratedString)) !== normalizedReferenceJsonString) { 
                 throw new Error(`The content of ${fileTest} is wrong`);
             }
         }
         else {
-            if (fileGeneratedString != testString) {
+            if (fileGeneratedString !== testString) {
                 throw new Error(`The content of ${fileTest} is wrong`);
             }
         }
