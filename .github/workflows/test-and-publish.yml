@@ -1,0 +1,46 @@
+name: Test and Publish Langium Extension (Beta)
+
+on:
+  push:
+    branches:
+      - main
+      - developing
+      - dev-auto-publish
+  pull-request:
+    branches:
+      - main
+      - developing
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.14.0'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Build project
+      - name: Build project
+        run: |
+          npm run langium:generate
+          npm run build
+
+      # Run Tests
+      - name: Run tests
+        run: npm test test_object
+
+      # Install vsce (VS Code Extension Manager)
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      # Publish extension with beta tag
+      - name: Publish to VSCode Marketplace (Beta)
+        run: vsce publish --pat ${{ secrets.VSCODE_TOKEN }} --tag beta

@@ -1,10 +1,11 @@
 name: Publish Langium Extension
 
+# As branches foram comentadas para apenas o workflow 'test-and-puplish.yml' ser executado
 on:
   push:
     branches:
-      - main
-      - developing
+      # - main
+      # - developing
 
 jobs:
   deploy:
