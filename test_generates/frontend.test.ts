@@ -7,9 +7,12 @@ import { EmptyFileSystem, LangiumDocument } from "langium";
 import {generate} from "../src/cli/frontend/vue-vite/generate.js"
 import fs from 'fs';
 import { checkIsDir, checkFileContent, checkIsFile } from "./checkers.js";
-import { services_checkers } from "./src_content_checkers/services_checkers.js";
 import { deleteFolderRecursive } from "./deletionFrontend.js";
 import path from 'path';
+import { SrcReceiver } from "./src_content_checkers/SrcReceiver.js";
+import { StoresCommand } from "./src_content_checkers/stores/StoresCommand.js";
+import { SrcInvoker } from "./src_content_checkers/SrcInvoker.js";
+import { ViewsCommand } from "./src_content_checkers/views/ViewsCommand.js";
 
 
 let services: ReturnType<typeof createSPARKServices>;
@@ -134,13 +137,17 @@ test(`Test File Names and Their Contents`, async () => {
 
     // agora, para o conteúdo de src
     const srcPath = path.join(frontEndPath, 'src');
-    checkIsDir(srcPath);
-    checkIsFile(path.join(srcPath, 'App.vue'));
-    checkFileContent(path.join(srcPath, 'App.vue'), "<template>\n  <RouterView></RouterView>\n</template>\n\n<script setup lang=\"ts\">\nimport { RouterView } from \"vue-router\";\n</script>");
-    checkIsFile(path.join(srcPath, 'config.ts'));
-    checkFileContent(path.join(srcPath, 'config.ts'), "export type ConfigProps = {\n    Sidebar_drawer: any;\n    Customizer_drawer: boolean;\n    mini_sidebar: boolean;\n    setHorizontalLayout: boolean;\n    setRTLLayout: boolean;\n    actTheme: string;\n    inputBg:string;\n    boxed: boolean;\n    setBorderCard: boolean;\n};\n\nconst config: ConfigProps = {\n    Sidebar_drawer: null,\n    Customizer_drawer: false,\n    mini_sidebar: false,\n    setHorizontalLayout: false, // Horizontal layout\n    setRTLLayout: false, // RTL layout\n    actTheme: 'ORANGE_THEME',\n    inputBg: 'ORANGE_THEME',\n    boxed: true,\n    setBorderCard: false\n};\n\nexport default config;");
-    checkIsFile(path.join(srcPath, 'main.ts'));
-    checkFileContent(path.join(srcPath, 'main.ts'), "import '@/scss/style.scss';\nimport Maska from 'maska';\nimport { createPinia } from 'pinia';\nimport { createApp } from 'vue';\nimport VueTablerIcons from 'vue-tabler-icons';\nimport VueApexCharts from 'vue3-apexcharts';\nimport 'vue3-carousel/dist/carousel.css';\nimport { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';\nimport 'vue3-perfect-scrollbar/style.css';\nimport App from './App.vue';\nimport vuetify from './plugins/vuetify';\nimport { router } from './router';\n\nimport { createI18n } from 'vue-i18n';\nimport VueScrollTo from 'vue-scrollto';\nimport Vue3EasyDataTable from 'vue3-easy-data-table';\nimport 'vue3-easy-data-table/dist/style.css';\nconst i18n = createI18n({\n    locale: 'en',\n    silentTranslationWarn: true,\n    silentFallbackWarn: true\n});\n\nconst app = createApp(App);\napp.use(router);\napp.component('EasyDataTable', Vue3EasyDataTable);\napp.use(PerfectScrollbarPlugin);\napp.use(createPinia());\napp.use(VueTablerIcons);\n// app.use(print);\napp.use(i18n);\napp.use(Maska);\napp.use(VueApexCharts);\napp.use(vuetify).mount('#app');\n//ScrollTop Use\n// app.use(VueScrollTo);\napp.use(VueScrollTo, {\n    duration: 1000,\n    easing: \"ease\"\n})");
+
+    // usando command para rodar arquivos e algumas subpastas de src
+    const invokerSrc = new SrcInvoker();
+    const receiverSrc = new SrcReceiver(srcPath);
+
+    const srcStoresPath = new StoresCommand(receiverSrc, 'stores');
+    invokerSrc.run(srcStoresPath);
+
+    const srcViewsPath = new ViewsCommand(receiverSrc, 'stores');
+    invokerSrc.run(srcViewsPath);
+
 
     // nessa pasta filha, e na pasta filha dela, não há arquivos ( : ) )
     const srcAssetsPath = path.join(srcPath, 'assets');
@@ -409,11 +416,6 @@ test(`Test File Names and Their Contents`, async () => {
     checkFileContent(path.join(servicesRequiresPath, 'factory.ts'), "import api from 'axios'\nimport useApi from '../../composition/UseApi'\n\nexport default function serviceFactory(apiUrl: string, listUrl?: string) {\n  const { list, post, update, remove, getById } = useApi(apiUrl)\n\n  let customList\n\n  if (listUrl) {\n    customList = async () => {\n      const { data } = await api.get(listUrl)\n      return data\n    }\n  }\n\n  return {\n    list: customList || list,\n    post,\n    update,\n    remove,\n    getById\n  }\n}");
 
 
-    // muchas cositas
-    const storesPath = path.join(srcPath, 'stores');
-    checkIsDir(storesPath);
-
-
     // pequenina (theme)
     const themePath = path.join(srcPath, 'theme');
     checkIsDir(themePath);
@@ -437,45 +439,5 @@ test(`Test File Names and Their Contents`, async () => {
     checkFileContent(path.join(utilsHelpersPath, 'fetch-wrapper.ts'), "import { useAuthStore } from '@/stores/auth';\n\nexport const fetchWrapper = {\n    get: request('GET'),\n    post: request('POST'),\n    put: request('PUT'),\n    delete: request('DELETE')\n};\n\nfunction request(method: string) {\n    return (url: any, body?: any) => {\n        const requestOptions: any = {\n            method,\n            headers: authHeader(url)\n        };\n        if (body) {\n            requestOptions.headers['Content-Type'] = 'application/json';\n            requestOptions.body = JSON.stringify(body);\n        }\n        return fetch(url, requestOptions).then(handleResponse);\n    };\n}\n\n// helper functions\n\nfunction authHeader(url: any) {\n    // return auth header with jwt if user is logged in and request is to the api url\n    const { user } = useAuthStore();\n    const isLoggedIn = !!user?.token;\n    const isApiUrl = url.startsWith(import.meta.env.VITE_API_URL);\n    if (isLoggedIn && isApiUrl) {\n        return { Authorization: `Bearer ${user.token}` };\n    } else {\n        return {};\n    }\n}\n\nfunction handleResponse(response: any) {\n    return response.text().then((text: any) => {\n        const data = text && JSON.parse(text);\n\n        if (!response.ok) {\n            const { user, logout } = useAuthStore();\n            if ([401, 403].includes(response.status) && user) {\n                // auto logout if 401 Unauthorized or 403 Forbidden response returned from api\n                logout();\n            }\n\n            const error = (data && data.message) || response.statusText;\n            return Promise.reject(error);\n        }\n\n        return data;\n    });\n}");
 
 
-    // grandinha (views)
-    const viewsPath = path.join(srcPath, 'views');
-    checkIsDir(viewsPath);
-    checkIsFile(path.join(viewsPath, 'index.vue'));
-    checkFileContent(path.join(viewsPath, 'index.vue'), "<template>\n</template>" );
-    const dashboardsViewsPath = path.join(viewsPath, 'dashboards');
-    checkIsDir(dashboardsViewsPath); // esta pasta nao tem arquivos
-
-    // auth views
-    const authenticationViewsPath = path.join(viewsPath, 'authentication');
-    checkIsDir(authenticationViewsPath); 
-    checkIsFile(path.join(authenticationViewsPath, 'Error.vue'));
-    checkFileContent(path.join(authenticationViewsPath, 'Error.vue'), "<template>\n    <div class=\"d-flex justify-center align-center text-center h-100\">\n        <div>\n            <h1 class=\"text-h1 pt-3\">Opps!!!</h1>\n            <h4 class=\"text-h4 my-8\">This page you are looking for could not be found.</h4>\n            <v-btn flat color=\"primary\" class=\"mb-4\" to=\"/\">Go Back to Home</v-btn>\n        </div>\n    </div>\n</template>");
-    checkIsFile(path.join(authenticationViewsPath, 'SideLogin.vue'));
-    checkFileContent(path.join(authenticationViewsPath, 'SideLogin.vue'), "<script setup lang=\"ts\">\nimport Logo from '@/layouts/full/logo/Logo.vue';\n/* Login form */\nimport LoginForm from '@/components/auth/LoginForm.vue';\n</script>\n\n<template>\n    <div class=\"pa-3\">\n        <v-row class=\"h-100vh mh-100 auth\">\n            <v-col cols=\"12\" lg=\"7\" xl=\"8\"\n                class=\"d-lg-flex align-center justify-center authentication position-relative\">\n                <div class=\"auth-header pt-lg-6 pt-2 px-sm-6 px-3 pb-lg-6 pb-0\">\n                    <div class=\"position-relative\">\n                        <Logo />\n                    </div>\n                </div>\n                <div class=\"\">\n                </div>\n            </v-col>\n            <v-col cols=\"12\" lg=\"5\" xl=\"4\" class=\"d-flex align-center justify-center bg-surface\">\n                <div class=\"mt-xl-0 mt-5 mw-100\">\n                    <h2 class=\"text-h3 font-weight-semibold mb-2\">Welcome to Flexy</h2>\n                    <div class=\"text-subtitle-1 mb-6\">Your Admin Dashboard</div>\n                    <LoginForm />\n                    <h6 class=\"text-h6  text-medium-emphasis  d-flex align-center mt-6 font-weight-medium\">\n                        New to Flexy?\n                        <v-btn class=\"pl-0 text-primary text-body-1 opacity-1 pl-2 font-weight-medium\" height=\"auto\"\n                            to=\"/auth/register\" variant=\"plain\">Create an account</v-btn>\n                    </h6>\n                </div>\n            </v-col>\n        </v-row>\n    </div>\n</template>");
-
-    // test views 
-    const testViewsPath = path.join(viewsPath, 'Test');
-    checkIsDir(testViewsPath); 
-    // da Entidade1:
-    const entidade1ViewsPath = path.join(testViewsPath, 'Entidade1');
-    checkIsDir(entidade1ViewsPath);
-    checkIsFile(path.join(entidade1ViewsPath, 'DetailsEntidade1.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'DetailsEntidade1.vue'), );
-    checkIsFile(path.join(entidade1ViewsPath, 'FormEntidade1.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'FormEntidade1.vue'), );
-    checkIsFile(path.join(entidade1ViewsPath, 'IndexEntidade1.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'IndexEntidade1.vue'), );
-
-    // da Entidade2:
-    const entidade2ViewsPath = path.join(testViewsPath, 'Entidade2');
-    checkIsDir(entidade2ViewsPath);
-    checkIsFile(path.join(entidade1ViewsPath, 'DetailsEntidade2.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'DetailsEntidade2.vue'), );
-    checkIsFile(path.join(entidade1ViewsPath, 'FormEntidade2.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'FormEntidade2.vue'), );
-    checkIsFile(path.join(entidade1ViewsPath, 'IndexEntidade2.vue'));
-    checkFileContent(path.join(entidade1ViewsPath, 'IndexEntidade2.vue'), );
-    
-    
     deleteFolderRecursive(frontEndPath);
 });
