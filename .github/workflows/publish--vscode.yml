@@ -1,56 +1,55 @@
-name: Publish Langium Extension
+# name: Publish Langium Extension
 
-# As branches foram comentadas para apenas o workflow 'test-and-puplish.yml' ser executado
-on:
-  push:
-    branches:
-      # - main
-      # - developing
+# on:
+#   push:
+#     branches:
+#       - main
+#       - developing
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
 
-      # Setup Node.js environment
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+#       # Setup Node.js environment
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '20'
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm ci
+#       # Install dependencies
+#       - name: Install dependencies
+#         run: npm ci
 
-      # Build project
-      - name: Build project
-        run: |
-          npm run langium:generate
-          npm run build
+#       # Build project
+#       - name: Build project
+#         run: |
+#           npm run langium:generate
+#           npm run build
 
-      # Cache Node.js modules and npm cache for faster builds
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+#       # Cache Node.js modules and npm cache for faster builds
+#       - name: Cache Node.js modules
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             ~/.npm
+#             node_modules
+#           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-node-
 
-      # Install vsce (VS Code Extension Manager)
-      - name: Install vsce
-        run: npm install -g @vscode/vsce
+#       # Install vsce (VS Code Extension Manager)
+#       - name: Install vsce
+#         run: npm install -g @vscode/vsce
 
-      # Publish extension based on the branch
-      - name: Publish to VSCode Marketplace
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            vsce publish --pat ${{ secrets.VSCODE_TOKEN }}
-          elif [[ "${{ github.ref }}" == "refs/heads/developing" ]]; then
-            vsce publish --pre-release --pat ${{ secrets.VSCODE_TOKEN }}
-          else
-            echo "Branch is neither main nor developing, skipping publish."
-          fi
+#       # Publish extension based on the branch
+#       - name: Publish to VSCode Marketplace
+#         run: |
+#           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+#             vsce publish --pat ${{ secrets.VSCODE_TOKEN }}
+#           elif [[ "${{ github.ref }}" == "refs/heads/developing" ]]; then
+#             vsce publish --pre-release --pat ${{ secrets.VSCODE_TOKEN }}
+#           else
+#             echo "Branch is neither main nor developing, skipping publish."
+#           fi
