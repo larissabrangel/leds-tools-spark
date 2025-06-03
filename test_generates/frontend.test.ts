@@ -7,6 +7,7 @@ import { EmptyFileSystem, LangiumDocument } from "langium";
 import {generate} from "../src/cli/frontend/vue-vite/generate.js"
 import fs from 'fs';
 import { checkIsDir, checkFileContent, checkIsFile } from "./checkers.js";
+import { services_checkers } from "./src_content_checkers/services_checkers.js";
 import { deleteFolderRecursive } from "./deletionFrontend.js";
 import path from 'path';
 
