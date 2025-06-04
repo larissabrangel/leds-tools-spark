@@ -8,6 +8,29 @@ let services: ReturnType<typeof createSPARKServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 let document: LangiumDocument<Model> | undefined;
 
+const testDocSpark = `
+Configuration {
+    software_name: "Test"
+    about: "Testes dos geradores do frontend"
+    language: python
+}
+
+module Test {
+    
+    entity Entidade1{
+        nome: string
+        numero: integer
+        Entidade1 OneToOne Test.Entidade2
+    }
+
+    entity Entidade2 {
+        nome: string
+        verificacao: boolean
+    } 
+    
+}
+`
+
 beforeAll(async () => {
     services = createSPARKServices(EmptyFileSystem);
     parse = parseHelper<Model>(services.SPARK);
@@ -15,82 +38,19 @@ beforeAll(async () => {
 
 
 test('Name Test', async () => {
-    document = await parse(`
-Configuration {
-    software_name: "Test"
-    about: "Testes dos geradores do frontend"
-    language: python
-}
-
-module Test {
-    
-    entity Entidade1{
-        nome: string
-        numero: integer
-        Entidade1 OneToOne Test.Entidade2
-    }
-
-    entity Entidade2 {
-        nome: string
-        verificacao: boolean
-    } 
-    
-}
-`)
+    document = await parse(testDocSpark)
 
     expect(getSwName(document)).toBe("Test")
 })
 
 test('Description Test', async () => {
-    document = await parse(`
-Configuration {
-software_name: "Test"
-about: "Testes dos geradores do frontend"
-    language: python
-}
-
-module Test {
-    
-    entity Entidade1{
-        nome: string
-        numero: integer
-        Entidade1 OneToOne Test.Entidade2
-    }
-
-    entity Entidade2 {
-        nome: string
-        verificacao: boolean
-    } 
-    
-}
-`)
+    document = await parse(testDocSpark)
 
     expect(getSwDesc(document)).toBe("Testes dos geradores do frontend")
 })
 
 test('Classes & Attributes Test', async () => {
-    document = await parse(`
-Configuration {
-    software_name: "Test"
-    about: "Testes dos geradores do frontend"
-    language: python
-}
-        
-module Test {
-            
-    entity Entidade1{
-        nome: string
-        numero: integer
-        Entidade1 OneToOne Test.Entidade2
-    }
-        
-    entity Entidade2 {
-        nome: string
-        verificacao: boolean
-    } 
-            
-}
-`)
+    document = await parse(testDocSpark)
     
     const model = document?.parseResult.value
     const clsList: LocalEntity[] = []

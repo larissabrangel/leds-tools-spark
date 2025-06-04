@@ -18,7 +18,8 @@ export function generate(model: Model, target_folder: string) : void {
  
     // using the lib
     let project = new SEON.default.ProjectAbstraction(softwareName, softwareDescription, SEON.default.vueModularArchProjectSettings, listPkg);
-    
+
+
     project.createProject();
     project.createProject();
     project.createProject();
