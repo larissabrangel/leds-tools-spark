@@ -6,7 +6,7 @@ on:
       - main
       - developing
       - dev-auto-publish
-  pull-requests:
+  pull_request:
     branches:
       - main
 
