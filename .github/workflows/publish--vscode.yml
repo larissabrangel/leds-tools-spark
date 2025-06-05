@@ -90,8 +90,8 @@ jobs:
             echo "Publishing to VSCode Marketplace..."
             vsce publish --pat ${{ secrets.VSCODE_TOKEN }} --tag beta
           else
-            echo "Dry-run: not publishing (either not main branch or not official repo)"
-            vsce publish --no-publish
+            echo "Creating package. Not publishing (either not main branch or not official repo)"
+            vsce package
           fi
       
       # # Publish extension based on the branch
