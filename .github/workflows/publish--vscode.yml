@@ -85,7 +85,14 @@ jobs:
 
       # Publish extension with beta tag
       - name: Publish to VSCode Marketplace (Beta)
-        run: vsce publish --pat ${{ secrets.VSCODE_TOKEN }} --tag beta
+        run: |
+          if [ "${{ github.repository }}" = "leds-org/leds-tools-spark" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "Publishing to VSCode Marketplace..."
+            vsce publish --pat ${{ secrets.VSCODE_TOKEN }} --tag beta
+          else
+            echo "Dry-run: not publishing (either not main branch or not official repo)"
+            vsce publish --no-publish
+          fi
       
       # # Publish extension based on the branch
       # - name: Publish to VSCode Marketplace
