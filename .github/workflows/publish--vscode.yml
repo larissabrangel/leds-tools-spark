@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - developing
+      - dev-test-pr2
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
