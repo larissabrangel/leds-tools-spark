@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - developing
-      - dev-test-pr2
+      - dev-test-pr
   pull_request:
     branches:
       - main
