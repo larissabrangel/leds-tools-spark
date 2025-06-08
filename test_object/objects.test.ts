@@ -8,7 +8,7 @@ import { ClassAbstraction, PackageAbstraction } from "seon-lib-implementation";
 
 let services: ReturnType<typeof createSPARKServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
-let document: LangiumDocument<Model> | undefined;
+let document: LangiumDocument<Model>;
 
 const testDocSpark = `
 Configuration {
@@ -36,25 +36,20 @@ module Test {
 beforeAll(async () => {
     services = createSPARKServices(EmptyFileSystem);
     parse = parseHelper<Model>(services.SPARK);
+    document = await parse(testDocSpark);
 });
 
 
 test('Name Test', async () => {
-    document = await parse(testDocSpark)
-
     expect(getSwName(document)).toBe("Test")
 })
 
 test('Description Test', async () => {
-    document = await parse(testDocSpark)
-
     expect(getSwDesc(document)).toBe("Testes dos geradores do frontend")
 })
 
 test('Classes & Attributes Test', async () => {
-    document = await parse(testDocSpark)
-    
-    const model = document?.parseResult.value
+    const model = document.parseResult.value
     const clsList: LocalEntity[] = []
 
     for (const absElem of model.abstractElements) {
@@ -96,11 +91,9 @@ test('Classes & Attributes Test', async () => {
 })
 
 test('fileToPackages Test', async () => {
-    const model = (await parse(testDocSpark)).parseResult.value
+    const model = document.parseResult.value
     
     const packages: PackageAbstraction[] = fileToPackages(model)
-
-    
 
     const cls1: ClassAbstraction = packages[0].getPackageLevelClasses()[0]
     expect(cls1.getName()).toBe("Entidade1")
