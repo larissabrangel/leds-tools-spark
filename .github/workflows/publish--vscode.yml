@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - developing
-      - dev-test-pr
+      - dev-test-pr #Nome da branch adicionada
   pull_request:
     branches:
       - main
