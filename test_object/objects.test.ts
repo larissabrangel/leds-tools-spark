@@ -3,6 +3,8 @@ import { isLocalEntity, isModule, LocalEntity, Model } from "../src/language/gen
 import { parseHelper } from "langium/test";
 import { createSPARKServices } from "../src/language/s-p-a-r-k-module.js";
 import { EmptyFileSystem, LangiumDocument } from "langium";
+import { fileToPackages } from "../src/cli/frontend/vue-vite/generate.js"
+import { ClassAbstraction, PackageAbstraction } from "seon-lib-implementation";
 
 let services: ReturnType<typeof createSPARKServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -90,6 +92,38 @@ test('Classes & Attributes Test', async () => {
     const attr2Cls2 = attrListCls2[1]
     expect(attr2Cls2.name).toBe("verificacao")
     expect(attr2Cls2.type.toString()).toBe("boolean")
+
+})
+
+test('fileToPackages Test', async () => {
+    const model = (await parse(testDocSpark)).parseResult.value
+    
+    const packages: PackageAbstraction[] = fileToPackages(model)
+
+    
+
+    const cls1: ClassAbstraction = packages[0].getPackageLevelClasses()[0]
+    expect(cls1.getName()).toBe("Entidade1")
+
+    const attrListCls1 = cls1.getAttributes()
+    const attr1Cls1 = attrListCls1[0]
+    expect(attr1Cls1.getName()).toBe("nome")
+    expect(attr1Cls1.getType().getName()).toBe("string")
+
+    const attr2Cls1 = attrListCls1[1]
+    expect(attr2Cls1.getName()).toBe("numero")
+    expect(attr2Cls1.getType().getName()).toBe("integer")
+
+    const cls2: ClassAbstraction = packages[1].getPackageLevelClasses()[0]
+    expect(cls2.getName()).toBe("Entidade2")
+
+    const attrListCls2 = cls2.getAttributes()
+    const attr1Cls2 = attrListCls2[0]
+    expect(attr1Cls2.getName()).toBe("nome")
+    expect(attr1Cls2.getType().getName()).toBe("string")
+    const attr2Cls2 = attrListCls2[1]
+    expect(attr2Cls2.getName()).toBe("verificacao")
+    expect(attr2Cls2.getType().getName()).toBe("boolean")
 })
 
 // config name

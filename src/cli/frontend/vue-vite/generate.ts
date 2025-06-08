@@ -5,7 +5,7 @@ import { createPath } from "../../util/generator-utils.js";
 import { generate as helpersGenerator } from "./helpers-generator.js";
 import { generate as publicGenerator } from "./public/generate.js";
 import { generate as srcGenerator } from "./src/generate.js";
-import SEON from "seon-lib-implementation";
+import SEON from "seon-lib-implementation"
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -17,14 +17,11 @@ export function generate(model: Model, target_folder: string) : void {
     const listPkg = fileToPackages(model)
  
     // using the lib
-    let project = new SEON.default.ProjectAbstraction(softwareName, softwareDescription, SEON.default.vueModularArchProjectSettings, listPkg);
-
+    let project = new SEON.ProjectAbstraction(softwareName, softwareDescription, SEON.vueModularArchProjectSettings, listPkg);
 
     project.createProject();
-    project.createProject();
-    project.createProject();
-    
 
+    // old generation (will be deleted and Spark will use the SparkLib)
     const target_folder_front = createPath(target_folder, "frontend")
 
     fs.mkdirSync(target_folder_front, {recursive:true})
@@ -36,7 +33,7 @@ export function generate(model: Model, target_folder: string) : void {
     srcGenerator(model, target_folder_front)
 }
 
-function fileToPackages(model: Model) {
+export function fileToPackages(model: Model) {
 
     const listPackages = []
 
@@ -49,13 +46,12 @@ function fileToPackages(model: Model) {
 
                     for (const attr of elem.attributes) {
                         if (isAttribute(attr)) {
-                            listAttr.push(new SEON.default.TypeScriptAttribute(attr.name, new SEON.default.PrimitiveTypeAbstraction(attr.type.toString())))
+                            listAttr.push(new SEON.TypeScriptAttribute(attr.name, new SEON.PrimitiveTypeAbstraction(attr.type.toString())))
                         }
                     }
+                    const cls = new SEON.ClassAbstraction(elem.name, [], listAttr)
 
-                    const cls = new SEON.default.ClassAbstraction(elem.name, [], listAttr)
-
-                    listPackages.push(new SEON.default.PackageAbstraction(elem.name, [cls], []))
+                    listPackages.push(new SEON.PackageAbstraction(elem.name, [cls], []))
                 }
             }
         }
