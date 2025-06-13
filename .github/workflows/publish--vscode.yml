@@ -60,6 +60,18 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: npm ci
+      
+      # Changes version
+      - name: Version packages
+        run: npx changeset version
+
+      # Commit version change and changelog
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "ci: version packages with changesets" || echo "No changes to commit"
+          git push
 
       # Build project
       - name: Build project
