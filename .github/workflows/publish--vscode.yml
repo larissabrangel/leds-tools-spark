@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - developing
+      - dev-auto-publish
   pull_request:
     branches:
       - main
